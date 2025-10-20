@@ -32,6 +32,17 @@ public:
             }
         }
     }
+
+    bool matches(const bool template_pattern[3][3]) const {
+        for (int i = 0; i < 3; ++i) {
+            for (int j = 0; j < 3; ++j) {
+                if (mat[i][j] != template_pattern[i][j]) {
+                    return false; // Found a mismatch
+                }
+            }
+        }
+        return true; // All elements match
+    }
 };
 
 #endif // CUSTOMMATRIX_H

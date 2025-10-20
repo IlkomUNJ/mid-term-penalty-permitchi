@@ -1,4 +1,5 @@
 #include "drawingcanvas.h"
+#include "Patterns.h"
 
 DrawingCanvas::DrawingCanvas(QWidget *parent)  {
     // Set a minimum size for the canvas
@@ -26,11 +27,38 @@ void DrawingCanvas::segmentDetection(){
     QPixmap pixmap = this->grab(); //
     QImage image = pixmap.toImage();
 
+    //misunderstood the assignment and spent way too long on this yay :^)
+    // QVector<QPoint> segmentPoints = m_points;
+    // QRect boundingBox;
+
+    // for (const QPoint& p : m_points) {
+    //     boundingBox = boundingBox.united(QRect(p, QSize(1, 1)));
+    // }
+
+    // // The QRect now represents the bounding box
+    // int minX = boundingBox.left();
+    // int maxX = boundingBox.right();
+    // int minY = boundingBox.top();
+    // int maxY = boundingBox.bottom();
+
+
+    // qDebug() << "Min X:" << minX << "Max X:" << maxX;
+    // qDebug() << "Min Y:" << minY << "Max Y:" << maxY;
+
+    // qDebug() << "List size:" << segmentPoints.size();
+    // for (const QPoint& p : segmentPoints) {
+    //     qDebug() << "Point (" << p.x() << "," << p.y() << ")";
+    // }
+    // cout << "image width " << maxX - minX << endl;
+    // cout << "image height " << maxY - minY << endl;
+
+
     cout << "image width " << image.width() << endl;
     cout << "image height " << image.height() << endl;
 
     //To not crash we set initial size of the matrix
     vector<CustomMatrix> windows(image.width()*image.height());
+    std::string feature_type = "None";
 
     // Get the pixel value as an ARGB integer (QRgb is a typedef for unsigned int)
     for(int i = 1; i < image.width()-1;i++){
@@ -47,6 +75,20 @@ void DrawingCanvas::segmentDetection(){
             CustomMatrix mat(local_window);
 
             windows.push_back(mat);
+
+            feature_type = "Background/Isolated Point"; // Default assumption
+
+            if (mat.matches(SegmentPatterns::HORIZONTAL_LINE)) {
+                feature_type = "Horizontal Line Segment";
+            } else if (mat.matches(SegmentPatterns::VERTICAL_LINE)) {
+                feature_type = "Vertical Line Segment";
+            } else if (mat.matches(SegmentPatterns::CORNER_90)) {
+                feature_type = "90-Degree Corner";
+            } else if (mat.matches(SegmentPatterns::T_JUNCTION)) {
+                feature_type = "T Junction";
+            }
+
+            cout << "CustomMatrix created at center coordinates: (" << i << ", " << j << ")" << endl;
         }
     }
     return;
@@ -94,5 +136,7 @@ void DrawingCanvas::mousePressEvent(QMouseEvent *event) {
     // Trigger a repaint
     update();
 }
+
+
 
 
